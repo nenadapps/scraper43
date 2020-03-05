@@ -169,6 +169,12 @@ selected_main_category = item_dict[selection]
 
 categories = get_categories(selected_main_category)   
 for category in categories:
+    print(category)
+    choice = input("Do you want to scrape this?")
+    if choice == 'Y':
+        pass
+    else:
+        continue
     subcategories = get_categories(category) 
     for subcategory in subcategories:
         page_url = subcategory
