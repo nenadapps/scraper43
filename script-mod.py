@@ -37,7 +37,7 @@ def get_html(url):
     html_content = ''
     try:
         page = requests.get(url, headers=hdr)
-        html_content = BeautifulSoup(page.content, "html.parser")
+        html_content = BeautifulSoup(page.content, "lxml")
     except: 
         pass
     
