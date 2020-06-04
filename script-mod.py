@@ -16,9 +16,9 @@ import socket
 import socks
 
 controller = Controller.from_port(port=9051)
-controller.authenticate()
+controller.authenticate()'''
 req = requests.Session()
-
+'''
 def connectTor():
     socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5 , "127.0.0.1", 9050)
     socket.socket = socks.socksocket
@@ -36,14 +36,14 @@ def get_html(url):
     
     html_content = ''
     try:
-        page = requests.get(url, headers=hdr)
+        page = req.get(url, headers=hdr)
         html_content = BeautifulSoup(page.content, "lxml")
     except: 
         pass
     
     return html_content
 
-def get_details(url):
+def get_details(url,selection,category,subcategory):
     
     stamp = {}
     
@@ -64,7 +64,7 @@ def get_details(url):
         raw_text = re.sub(' +', ' ', raw_text)
         raw_text = raw_text.replace('\n', ' ').strip()
         raw_text = raw_text.replace(u'\xa0', u' ').strip()
-        stamp['raw_text'] = raw_text
+        stamp['raw_text'] = raw_text.replace('"',"'")
     except:
         stamp['raw_text'] = None
     
@@ -209,29 +209,22 @@ def query_for_previous(stamp):
     stamp['raw_text'],
     stamp['scrape_date'], 
     stamp['price'], 
-    stamp['currency'],
-    stamp['number']))
+    stamp['currency']))
     
     if len(all_rows) > 0:
         print ("This is in the database already")
-        conn1 = sqlite3.connect('Reference_data.db')
-        c = conn1.cursor()
-        c.executemany("""INSERT INTO price_list (url, raw_text, scrape_date, price, currency, number) VALUES(?,?,?,?,?,?)""", price_update)
-        conn1.commit()
-        conn1.close()
-        print (" ")
-        #url_count(count)
         sleep(randint(25,55))
         next_step= 'continue'
         pass
     else:
         os.chdir("/Volumes/Stamps/")
-        conn2 = sqlite3.connect('Reference_data.db')
-        c2 = conn2.cursor()
-        c2.executemany("""INSERT INTO price_list (url, raw_text, scrape_date, price, currency, number) VALUES(?,?,?,?,?,?)""", price_update)
-        conn2.commit()
-        conn2.close()
-        next_step = 'pass'
+        if stamp['price']!=None:
+        	conn2 = sqlite3.connect('Reference_data.db')
+        	c2 = conn2.cursor()
+        	c2.executemany("""INSERT INTO price_list (url, raw_text, scrape_date, price, currency) VALUES(?,?,?,?,?)""", price_update)
+        	conn2.commit()
+        	conn2.close()
+        next_step='pass'
     return(next_step)
 
 def db_update_image_download(stamp):  
@@ -263,7 +256,7 @@ def db_update_image_download(stamp):
         stamp['url'],
         stamp['raw_text'],
         stamp['title'],
-        stamp['base_category '],
+        stamp['base_category'],
         stamp['category'],
         stamp['subcategory'],
         stamp['scrape_date'],
@@ -272,18 +265,17 @@ def db_update_image_download(stamp):
     conn = sqlite3.connect('Reference_data.db')
     conn.text_factory = str
     cur = conn.cursor()
-    cur.executemany("""INSERT INTO delecamp ('url','raw_text', 'base_category','category', 'subcategory',
+    cur.executemany("""INSERT INTO delecamp ('url','raw_text', 'title', 'base_category','category', 'subcategory',
     'scrape_date','image_paths') 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)""", database_update)
     conn.commit()
     conn.close()
     print ("++++++++++++")
-    sleep(randint(60,160)) 
+    sleep(randint(35,120)) 
 
 count = 0
 connectTor()
 '''
-
 item_dict = get_main_categories()
 
 for key in item_dict:
@@ -323,10 +315,12 @@ for category in categories:
                     count = 0
                 else:
                     pass'''
-                stamp = get_details(page_item) 
-                '''if stamp['price']==None or stamp['price']=='':
-                    sleep(randint(500,700))
-                    continue
+                stamp = get_details(page_item, selection, category, subcategory)
+                '''if stamp['price']==None and stamp['raw_text']==None and stamp['title']==None:
+                	sleep(randint(800,2000))
+                	continue
+                else:
+                    pass
                 next_step = query_for_previous(stamp)
                 if next_step == 'continue':
                     print('Only updating price')
