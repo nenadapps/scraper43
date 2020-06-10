@@ -183,6 +183,51 @@ def get_categories(url):
     shuffle(list(set(items)))
     
     return items
+
+def get_subcategories(category):    
+    
+    subcategories = get_categories(category) 
+    for subcategory in subcategories:
+        print(subcategory)
+        choice = input('Do you want to scrape this?')
+        if choice =='Y':
+            pass
+        else:
+            continue
+        page_url = subcategory
+        while(page_url):
+            page_items, page_url = get_page_items(page_url)
+            if(len(page_items)):
+                for page_item in page_items:
+                    '''count += 1
+                    if count > randint(100, 256):
+                        print('Sleeping...')
+                        sleep(randint(600, 4000))
+                        hdr['User-Agent'] = UA.random
+                        renew_tor()
+                        connectTor()
+                        count = 0
+                    else:
+                        pass'''
+                    stamp = get_details(page_item, selection, category, subcategory)
+                    '''if stamp['price']==None and stamp['raw_text']==None and stamp['title']==None:
+                            sleep(randint(800,2000))
+                            continue
+                    else:
+                        pass
+                    next_step = query_for_previous(stamp)
+                    if next_step == 'continue':
+                        print('Only updating price')
+                        continue
+                    elif next_step == 'pass':
+                        print('Inserting the item')
+                        pass
+                    else:
+                        break
+                    db_update_image_download(stamp)'''
+            else:
+                get_subcategories(subcategory)
+
 '''
 def file_names(stamp):
     file_name = []
@@ -293,42 +338,7 @@ for category in categories:
         pass
     else:
         continue
-    subcategories = get_categories(category) 
-    for subcategory in subcategories:
-        print(subcategory)
-        choice = input('Do you want to scrape this?')
-        if choice =='Y':
-            pass
-        else:
-            continue
-        page_url = subcategory
-        while(page_url):
-            page_items, page_url = get_page_items(page_url)
-            for page_item in page_items:
-                '''count += 1
-                if count > randint(100, 256):
-                    print('Sleeping...')
-                    sleep(randint(600, 4000))
-                    hdr['User-Agent'] = UA.random
-                    renew_tor()
-                    connectTor()
-                    count = 0
-                else:
-                    pass'''
-                stamp = get_details(page_item, selection, category, subcategory)
-                '''if stamp['price']==None and stamp['raw_text']==None and stamp['title']==None:
-                	sleep(randint(800,2000))
-                	continue
-                else:
-                    pass
-                next_step = query_for_previous(stamp)
-                if next_step == 'continue':
-                    print('Only updating price')
-                    continue
-                elif next_step == 'pass':
-                    print('Inserting the item')
-                    pass
-                else:
-                    break
-                db_update_image_download(stamp)'''
+    
+    get_subcategories(category)    
+        
 print('Scrape Complete')
